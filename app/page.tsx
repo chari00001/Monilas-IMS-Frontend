@@ -3,6 +3,7 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation'; 
 import Navbar from '@/components/Navbar'; 
 import Footer from '@/components/Footer'; 
 import StudentHome from '@/components/StudentHome';
@@ -23,17 +24,28 @@ interface User {
 
 const Home: NextPage = () => {
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter(); // Initialize router
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
     const storedUser = localStorage.getItem('user');
+
+    if (!token) {
+      // If token is missing, redirect to /login
+      setTimeout(() => {
+        router.push('/login');
+      },1000);
+
+      return;
+    }
 
     if (storedUser) {
       const parsedUser: User = JSON.parse(storedUser);
-      setUser({ ...parsedUser }); // Directly use the parsed user
+      setUser(parsedUser);
     } else {
       setUser(null);
     }
-  }, []);
+  }, [router]);
 
   return (
     <div className='min-h-screen flex flex-col'>
@@ -47,10 +59,6 @@ const Home: NextPage = () => {
       <main className="container mx-auto px-4 py-8 flex-grow">
         <h1 className="text-4xl font-bold mb-4">Welcome to the University Automation System</h1>
 
-        {/* Upcoming Events - Visible to both students and lecturers */}
-        <UpcomingEvents />
-
-        {/* Conditional Rendering Based on User Role */}
         {user ? (
           user.role === 'student' ? (
             <StudentHome />
@@ -58,11 +66,12 @@ const Home: NextPage = () => {
             <LecturerHome />
           )
         ) : (
-          <p>Loading...</p> // Show loading or error state if user data is not available
+          <p>Loading...</p> 
         )}
+
+        <UpcomingEvents />
       </main>
 
-      <Footer />
     </div>
   );
 }

@@ -19,9 +19,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="min-h-screen h-full">
-      <body className={inter.className}>
-      <Navbar />
-      {children}</body>
+      <body className={`flex flex-col min-h-screen ${inter.className}`}>
+        <Navbar />
+        {/* Main Content Area */}
+        <main className="flex-grow">
+          {children}
+        </main>
+        {/* Footer Always at the Bottom */}
+        <Footer />
+      </body>
     </html>
   );
 }
